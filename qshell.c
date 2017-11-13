@@ -6,8 +6,7 @@
 **/
 
 #include "qshell.h"
-
-#define TRUE 1
+#define MAXARG 20
 
 void process_command()
 {
@@ -15,16 +14,17 @@ void process_command()
     int status;
     char buf[MAXLINE];
     char prompt[MAX_PROMPT_LEN];
-
-    while(TRUE)
+    char** parameters = malloc(sizeof(char *)*(MAXARG+2));
+    char *command = NULL;
+    while(1)
     {
-        type_prompt(prompt);
-        // read_command(command,parameters);
-        const char * command = "ls";
-        int h = 32;
-        char **parameters = (char **)malloc(sizeof(char*) * h);
-        parameters[0] = "ls";
-        parameters[1] = "-l";
+//        type_prompt(prompt);
+//        read_command(command,parameters);
+        // const char * command = "ls";
+        // int h = 32;
+        // char **parameters = (char **)malloc(sizeof(char*) * h);
+        // parameters[0] = "ls";
+        // parameters[1] = "-l";
         if ((pid = fork()) < 0) {
             err_sys("fork error!");
             exit(1);
@@ -40,10 +40,10 @@ void process_command()
             printf("status: %d, pid: %d", status, pid);
         }
     }
+    free(parameters);
 }
 
-int main() {
-
-    process_command();
-    return 0;
-}
+//int main() {
+//    process_command();
+//    return 0;
+//}

@@ -5,16 +5,17 @@
 @desc: 模拟linux shell提示符输出
 **/
 
-#include "qshell.h"
+#include <pwd.h>
 
 const int MAX_NAME_LEN = 256;
 const int MAX_PATH_LEN = 1024;
 
+
 void type_prompt(char *prompt)
 {
     struct passwd *pwd;
-    char *hostname;
-    char *curr_working_path;
+    char hostname[MAX_NAME_LEN];
+    char curr_working_path[MAX_PATH_LEN];
     int length;
     pwd = getpwuid(getuid());
     getcwd(curr_working_path, MAX_NAME_LEN);
@@ -33,6 +34,7 @@ void type_prompt(char *prompt)
         sprintf(prompt+length,"#");
     else
         sprintf(prompt+length,"$");
+    printf("%s", prompt);
     return;
 }
 
