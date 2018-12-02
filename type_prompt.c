@@ -35,9 +35,9 @@ void type_prompt(char *prompt)
     int length;
     int host_len;
     pwd = getpwuid(getuid());
-    getcwd(curr_working_path, MAX_NAME_LEN);
-    if(0 == gethostname(hostname, MAX_PATH_LEN))
-        sprintf(prompt, "[qshell]%s@%s:", pwd->pw_name,hostname);
+    getcwd(curr_working_path, MAX_PATH_LEN);
+    if(0 == gethostname(hostname, MAX_NAME_LEN))
+        sprintf(prompt, "[qshell]%s@%s:", pwd->pw_name, hostname);
     else
         sprintf(prompt, "[qshell]%s@unknown:", pwd->pw_name);
     length = strlen(prompt);

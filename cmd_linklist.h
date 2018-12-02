@@ -18,7 +18,7 @@ struct cmd_info
 typedef struct link_cmd_node{
 	struct cmd_info info_data;
 	struct link_cmd_node *next;
-}link_cmd_node;
+} link_cmd_node;
 #endif
 
 link_cmd_node* cmd_linklist_create(link_cmd_node *, char**, int*);

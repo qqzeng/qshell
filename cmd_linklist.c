@@ -28,6 +28,7 @@ link_cmd_node* cmd_linklist_create(link_cmd_node *L, char** parameters, int *nco
 	while ((*pdata) != NULL) {
 		char** arg = malloc(sizeof(char*)*MAXARG);
 		int j = 0;
+		// parse a integral command including following paramenters.
 		while((*pdata) != NULL && 0 != strcmp((*pdata), "|")) {
 			char* str_tmp = malloc(sizeof(char)*MAX_SINGLE_CMD);
 			strcpy(str_tmp, *pdata);
@@ -35,7 +36,7 @@ link_cmd_node* cmd_linklist_create(link_cmd_node *L, char** parameters, int *nco
 			if (0 == strcmp(*pdata, "<")) {
 				p->info_data.flag |= IN_REDIRECT;
 			}
-			//TODO valid command.(cat tmp > res | wc -l)(cat tmp | ls -l)
+			//TODO: valid command.(cat tmp > res | wc -l)(cat tmp | ls -l)
 			if (0 == strcmp(*pdata, ">")) {
 				p->info_data.flag |= OUT_REDIRECT;
 			}
@@ -46,12 +47,14 @@ link_cmd_node* cmd_linklist_create(link_cmd_node *L, char** parameters, int *nco
 			if (0 == strcmp(*pdata, "&")) {
 				p->info_data.flag |= BACKGROUND;
 			}
+			// the first string is command.
 			if (0 == j) p->info_data.cmd = (*pdata);
 #ifdef DEBUG
 	printf("[qshell:info:cmd_linklist] %d\t%s\n", j, arg[j]);
 #endif
 			pdata++;
 			j++;
+			// free(str_tmp);
 		}
 		arg[j] = NULL;
 		p->info_data.arguments = arg;
@@ -77,7 +80,7 @@ link_cmd_node* cmd_linklist_create(link_cmd_node *L, char** parameters, int *nco
 	return L;
 }
 
-/* print the cmd linklist */
+/* print the command linklist */
 void cmd_linklist_print(link_cmd_node *L){
 	if (NULL == L || NULL == L->next) {
 		perror("[qshell:info] empty command linklist.");

@@ -26,16 +26,20 @@ int process_command() {
 	while(TRUE) 
 	{
         printf("====qshell pid: %d=====\n",getpid());
-        // show system prompt
+        // show system prompt.
 		type_prompt(prompt);
-        // read command from stdio
+        // read command from stdio.
         ncommand = read_command(command,parameters);
         if(ncommand <= 0)
             continue;
+        // parse command string array.
         cmd_list = cmd_parse(parameters, cmd_list, &npipe);
+        // execute built-in command.
         if(builtin_cmd_process(cmd_list))
             continue;
+        // execute commands.
         execute_cmd(cmd_list, npipe);
+        printf("while exit.....");
     }
     return 1;
 }

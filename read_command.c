@@ -1,10 +1,12 @@
-/**
-@author: qqzeng
-@email: qtozeng@gmail.com
-@date: 17-11-13
-@desc: 模拟接收 qshell 命令的输入
-**/
+
 #include "qshell.h"
+
+/**
+ * read input command string.
+ * store the FIRST command in command and 
+ * have parameter store the whole command string.
+ */
+
 // #define DEBUG
 
 int read_command(char **command, char **parameters)
@@ -13,15 +15,14 @@ int read_command(char **command, char **parameters)
     char *buffer = malloc(sizeof(char*)*(MAX_COMMAND_LEN));
     buffer = fgets(buffer, MAX_COMMAND_LEN, stdin);
     // error input
-    if (NULL == buffer)
-    {
+    if (NULL == buffer) {
         exit(0);
     }
     // no input
-    if (buffer[0] == '\0')
-    {
+    if (buffer[0] == '\0') {
         return -1;
     }
+    
 #ifdef DEBUG
     printf("[qshell:info:read_command] buffer:%s", buffer);
 #endif
@@ -51,7 +52,7 @@ int read_command(char **command, char **parameters)
             ptr_end++;
 
         // extract the first command, may be some options behind left.
-        if (0 == count){
+        if (0 == count) {
             char *p = ptr_end;
             command[0] = ptr_start;
             int i = 0;

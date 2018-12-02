@@ -15,11 +15,11 @@
 
 static builtin_cmd builtins[] = 
 {
-	{"exit", do_exit},
-	{"cd", do_cd},
+    {"exit", do_exit},
+    {"cd", do_cd},
     {"jobs",do_jobs},
     {"kill",do_kill},
-	{NULL, NULL}
+    {NULL, NULL}
 };
 
 
@@ -27,33 +27,33 @@ static builtin_cmd builtins[] =
 // which are similiar to <kill -9 pidNum> | <jobs &> etc.
 int check_builtin_cmd(char* cmd_name, link_cmd_node *cmd_node)
 {
-	return find_specific_cmd(cmd_name, cmd_node);
+    return find_specific_cmd(cmd_name, cmd_node);
 }
 
 /* only handle built-in command like exit, quit, cd, kill */
 int builtin_cmd_process(link_cmd_node *cmd_node)
 {
-	int i = 0;
-	int found = 0;
-	while (builtins[i].cmd_name != NULL)
-	{
-		if (check_builtin_cmd(builtins[i].cmd_name, cmd_node))
-		{
-			builtins[i].handler(builtins[i].cmd_name, cmd_node);
-		#ifdef DEBUG
-			printf("[qshell:info:built-in_command] %s\n", builtins[i].cmd_name);
-		#endif
-			found = 1;
-			break;
-		}
-		i++;
-	}
-	return found;
+    int i = 0;
+    int found = 0;
+    while (builtins[i].cmd_name != NULL)
+    {
+        if (check_builtin_cmd(builtins[i].cmd_name, cmd_node))
+        {
+            builtins[i].handler(builtins[i].cmd_name, cmd_node);
+        #ifdef DEBUG
+            printf("[qshell:info:built-in_command] %s\n", builtins[i].cmd_name);
+        #endif
+            found = 1;
+            break;
+        }
+        i++;
+    }
+    return found;
 }
 
 int do_exit(char* cmd_name, link_cmd_node* cmd_node)
 {
-	#ifdef DEBUG
+    #ifdef DEBUG
        printf("[qshell:info:built-in_command] %s\n", cmd_name);
     #endif
     int n_bg_process = 0;
@@ -70,16 +70,16 @@ int do_exit(char* cmd_name, link_cmd_node* cmd_node)
        if(exit_code == 'N')
            return 1;
     } 
-	printf("exit... \n");
-	exit(EXIT_SUCCESS);
+    printf("exit... \n");
+    exit(EXIT_SUCCESS);
 }
 
 int do_jobs(char* cmd_name, link_cmd_node* cmd_node)
 {
     process_node *p = process_head_node->next;
-	if (NULL == p) {
-    	printf("[qshell:info:built-in_command] there is no bg process.\n");
-    	return 1;
+    if (NULL == p) {
+        printf("[qshell:info:built-in_command] there is no bg process.\n");
+        return 1;
     }
     while(NULL != p) {
         int i = 0;
@@ -97,10 +97,10 @@ int do_jobs(char* cmd_name, link_cmd_node* cmd_node)
 // kill pidnum
 int do_kill(char* cmd_name, link_cmd_node* cmd_node)
 {
-	if (NULL == cmd_node || NULL == cmd_node->next) {
-		perror("[qshell:info:built-in_command] empty command linklist.");
-		return 0;
-	}
+    if (NULL == cmd_node || NULL == cmd_node->next) {
+        perror("[qshell:info:built-in_command] empty command linklist.");
+        return 0;
+    }
     int pidnum = atoi(cmd_node->next->info_data.arguments[1]);
     signal(SIGQUIT, SIG_DFL);
     kill(pidnum, SIGQUIT);
@@ -123,52 +123,52 @@ int do_kill(char* cmd_name, link_cmd_node* cmd_node)
 
 int do_cd(char* cmd_name, link_cmd_node* cmd_node)
 {
-	if (NULL == cmd_node || NULL == cmd_node->next) {
-		perror("[qshell:info:built-in_command] empty command linklist.");
-		return 0;
-	}
-	char** parameters = cmd_node->next->info_data.arguments;
+    if (NULL == cmd_node || NULL == cmd_node->next) {
+        perror("[qshell:info:built-in_command] empty command linklist.");
+        return 0;
+    }
+    char** parameters = cmd_node->next->info_data.arguments;
 
     char *cd_path = NULL;
     struct passwd *pwd = getpwuid(getuid());
-	// NULL, ~ or starts with ~ 
+    // NULL, ~ or starts with ~ 
     if (NULL == parameters[1] || 0 == strcmp(parameters[1],"~") || parameters[1][0] == '~'){
-    	if (NULL == parameters[1]) {
-    		cd_path = (char*) malloc(strlen(pwd -> pw_dir));
-    	} else {
-	        cd_path = (char*) malloc(strlen(pwd -> pw_dir)+ strlen(parameters[1]));
-    	}
+        if (NULL == parameters[1]) {
+            cd_path = (char*) malloc(strlen(pwd -> pw_dir));
+        } else {
+            cd_path = (char*) malloc(strlen(pwd -> pw_dir)+ strlen(parameters[1]));
+        }
         strcpy(cd_path,pwd->pw_dir);
-       	if (NULL != parameters[1]) {
-	        strncpy(cd_path+strlen(pwd->pw_dir),parameters[1]+1,strlen(parameters[1]));
-       	}
+        if (NULL != parameters[1]) {
+            strncpy(cd_path+strlen(pwd->pw_dir),parameters[1]+1,strlen(parameters[1]));
+        }
     } else {
         cd_path = malloc(strlen(parameters[1]+1));
         strcpy(cd_path,parameters[1]);
     }
 #ifdef DEBUG
-	printf("[qshell:info:built-in_command] %s\t%s\n", parameters[0], parameters[1]);
+    printf("[qshell:info:built-in_command] %s\t%s\n", parameters[0], parameters[1]);
     printf("cd_path:%s\n", cd_path);
 #endif
     if (0 != chdir(cd_path)){
-		printf("[qshell:info:built-in_command]: cd: %s:%s\n",cd_path,strerror(errno));
-		return 0;
-	}
-	return 1;
+        printf("[qshell:info:built-in_command]: cd: %s:%s\n",cd_path,strerror(errno));
+        return 0;
+    }
+    return 1;
 #ifdef DEBUG
-	    printf("cd_path:%s\n", cd_path);
-	    int res = chdir(cd_path);
-		char* curr_working_path = (char*)malloc((sizeof(char))*100);
-		getcwd(curr_working_path, 100);
-		printf("status: %d %s\n", res, curr_working_path);
+        printf("cd_path:%s\n", cd_path);
+        int res = chdir(cd_path);
+        char* curr_working_path = (char*)malloc((sizeof(char))*100);
+        getcwd(curr_working_path, 100);
+        printf("status: %d %s\n", res, curr_working_path);
 #endif
-	    free(cd_path);
+        free(cd_path);
 }
 
 
 int builtin_command(char *command, char **parameters)
 {
-	struct passwd *pwd = getpwuid(getuid());
+    struct passwd *pwd = getpwuid(getuid());
     if(0 == strcmp(command,"exit") || 0 == strcmp(command,"quit"))
         exit(0);
     else if(0 == strcmp(command,"about"))
@@ -180,27 +180,27 @@ int builtin_command(char *command, char **parameters)
     else if(0 == strcmp(command,"cd"))
     {
         char *cd_path = NULL;
-	    // NULL, ~ or starts with ~ 
-	    if (parameters[1] == NULL || 0 == strcmp(parameters[1],"~") || parameters[1][0] == '~'){
-	        cd_path = (char*) malloc(strlen(pwd->pw_dir)+strlen(parameters[1]));
-	        strcpy(cd_path,pwd->pw_dir);
-	        strncpy(cd_path+strlen(pwd->pw_dir),parameters[1]+1,strlen(parameters[1]));
-	    } else {
-	        cd_path = (char*) malloc(strlen(parameters[1]+1));
-	        strcpy(cd_path,parameters[1]);
-	    }
-	    if (0 != chdir(cd_path)){
-			printf("[qshell]: cd: %s:%s\n",cd_path,strerror(errno));
-		}
+        // NULL, ~ or starts with ~ 
+        if (parameters[1] == NULL || 0 == strcmp(parameters[1],"~") || parameters[1][0] == '~'){
+            cd_path = (char*) malloc(strlen(pwd->pw_dir)+strlen(parameters[1]));
+            strcpy(cd_path,pwd->pw_dir);
+            strncpy(cd_path+strlen(pwd->pw_dir),parameters[1]+1,strlen(parameters[1]));
+        } else {
+            cd_path = (char*) malloc(strlen(parameters[1]+1));
+            strcpy(cd_path,parameters[1]);
+        }
+        if (0 != chdir(cd_path)){
+            printf("[qshell]: cd: %s:%s\n",cd_path,strerror(errno));
+        }
 #ifdef DEBUG
-	    printf("cd_path:%s\n", cd_path);
-	    int res = chdir(cd_path);
-		char* curr_working_path = (char*)malloc((sizeof(char))*100);
-		getcwd(curr_working_path, 100);
-		printf("status: %d %s\n", res, curr_working_path);
+        printf("cd_path:%s\n", cd_path);
+        int res = chdir(cd_path);
+        char* curr_working_path = (char*)malloc((sizeof(char))*100);
+        getcwd(curr_working_path, 100);
+        printf("status: %d %s\n", res, curr_working_path);
 #endif
-	    free(cd_path);
-	}
+        free(cd_path);
+    }
     return 0;
 }
 
@@ -211,6 +211,6 @@ int builtin_command(char *command, char **parameters)
 //     parameters[0] = "cd";
 //     parameters[1] = "~/workspace/c";
 //     parameters[2] = NULL;
-// 	builtin_command("cd", parameters);
-// 	return 0;
+//  builtin_command("cd", parameters);
+//  return 0;
 // }
