@@ -40,10 +40,12 @@ int main(int argc,char**argv)
 void new_op(int signum,siginfo_t *info,void *myact)//三参数信号处理函数的实现
 {
 	int i;
+	char* tmp = (char *)(*info).si_ptr;
 	for(i=0;i<10;i++)
 	{
 		printf("singno:%d\terrno:%d\tsi_pid:%d\tsi_uid:%d\n", info->si_signo, info->si_errno, info->si_pid, info->si_uid);
-		printf("%c\n ",(*( (char*)((*info).si_ptr)+i)));
+		// printf("%c\n ",(*( (char*)((*info).si_ptr)+i)));
+		printf("%c\n ",tmp[i]);
 	}
-	printf("handle signal %d over;",signum);
+	printf("handle signal %d over;\n",signum);
 }

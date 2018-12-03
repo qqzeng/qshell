@@ -16,13 +16,14 @@ int read_command(char **command, char **parameters)
     buffer = fgets(buffer, MAX_COMMAND_LEN, stdin);
     // error input
     if (NULL == buffer) {
-        exit(0);
+        // exit(0);
+        return -1;
     }
     // no input
     if (buffer[0] == '\0') {
         return -1;
     }
-    
+
 #ifdef DEBUG
     printf("[qshell:info:read_command] buffer:%s", buffer);
 #endif

@@ -1,5 +1,7 @@
 #include "qshell.h"
 #include "cmd_linklist.h"
+#include "init.h"
+
 // #define DEBUG
 
 void cmd_info_init(link_cmd_node *cmd_node)
@@ -124,4 +126,23 @@ int find_specific_cmd(char* cmd_name, link_cmd_node *L)
 		p = p->next;
 	}
 	return 0;
+}
+
+/* remove process node by pid */
+int remove_process_by_id(int pid)
+{
+	process_node *p = process_head_node->next;
+    process_node *pre = process_head_node;
+    if (NULL == p) {printf("[qshell:info] empty bg linklist!\n");return 0;}
+    while(p != NULL)
+    {
+    	if (p->npid == pid) {
+        	pre->next = p->next;
+            free(p);
+            return 1;
+        }
+        pre = p;
+        p = p->next;
+    }
+    return 0;
 }

@@ -19,10 +19,12 @@ void main()
 	sigaddset(&new_mask,SIGRTMIN+10);
 	if(sigprocmask(SIG_BLOCK, &new_mask,&old_mask))
 		printf("block signal SIGRTMIN+10 error\n");
-	sleep(10);
-	printf("now begin to get pending mask and unblock SIGRTMIN+10\n");
+	sleep(3);
+	printf("now begin to get pending mask SIGRTMIN+10\n");
 	if(sigpending(&pending_mask)<0)
 		printf("get pending mask error\n");
+	sleep(8);
+	printf("now begin to unblock SIGRTMIN+10\n");
 	if(sigismember(&pending_mask,SIGRTMIN+10))
 		printf("signal SIGRTMIN+10 is pending\n");
 	if(sigprocmask(SIG_SETMASK,&old_mask,NULL)<0)

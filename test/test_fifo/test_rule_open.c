@@ -14,6 +14,7 @@
 #define FIFO_SERVER "/tmp/fifoserver"
 
 int handle_client(char*);
+int w_open(char*arg);
 
 void main(int argc,char** argv)
 {
@@ -55,12 +56,12 @@ int handle_client(char* arg)
 	unlink(FIFO_SERVER);
 }
 
-int w_open(char*arg)
 //0  open error for no reading
 //-1 open error for other reasons
 //1  open ok
+int w_open(char*arg)
 {
-	if(open(arg, O_WRONLY|O_NONBLOCK, 0) == -1)
+	if(open(arg, O_WRONLY|O_NONBLOCK, 0) == -1) // open for write and non-block
 	{
 		if(errno == ENXIO)
 		{

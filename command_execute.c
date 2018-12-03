@@ -7,30 +7,8 @@
 
 // #define DEBUG
 
-struct sigaction act_cmd_execute;
-
-void sig_handle_bgp_exit_2(int signo)
-{
-    if (signo == SIGCHLD) {printf("=====SIGCHLD====\n");}
-    int status;
-    wait(&status);
-    printf("=========status=%d=======\n", status);
-    if(WIFEXITED(status)) {
-        printf("SIGCHLD--->%d\n",WEXITSTATUS(status));
-    }
-}
-
-/* actions before command executing */
-void setup()
-{
-    if (signal(SIGCHLD, sig_handle_bgp_exit) == SIG_ERR) {
-        printf("signal installs error!\n");
-    }
-}
-
 void execute_cmd(link_cmd_node* cmd_node, int npipe)
 {
-    // setup();
     link_cmd_node* p_node = cmd_node;
 #ifdef DEBUG
     printf("npipe=%d\n", npipe);
@@ -45,7 +23,7 @@ void execute_cmd(link_cmd_node* cmd_node, int npipe)
 
     for(i = 0; i < (npipe); i++){
         if(pipe(pipe_fds + i*2) < 0) {
-            printf("pipe error");
+            perror("pipe error");
             exit(EXIT_FAILURE);
         }
     }
@@ -58,7 +36,9 @@ void execute_cmd(link_cmd_node* cmd_node, int npipe)
         // won't call <wait> to wait child to exit.
         // parent will ignore SIGCHLD signal to avoid zombie process.
         if ((command->flag & BACKGROUND)) {
-            signal(SIGCHLD, sig_handle_bgp_exit_2);
+            if (signal(SIGCHLD, sig_handle_bgp_exit) == SIG_ERR) {
+                perror("signal SIGCHLD installs error!");
+            }
             // signal(SIGCHLD, SIG_IGN);
             // remove the redundant argument info. 
             // remove the last character, i.e. sysmbol '&'.
@@ -78,7 +58,10 @@ void execute_cmd(link_cmd_node* cmd_node, int npipe)
             #endif
                 if (in_redirect_info_parse(command)){
                     close(STDIN_FILENO);
-                    dup2(command->in_fd, fileno(stdin)); // TODO: check duplicate result carefully.
+                    if (dup2(command->in_fd, fileno(stdin)) < 0) {
+                        perror("[1] dup2 error");
+                        exit(EXIT_FAILURE); 
+                    }
                 } else {
                     perror("[1] in redirect error");
                     exit(EXIT_FAILURE);
@@ -92,7 +75,10 @@ void execute_cmd(link_cmd_node* cmd_node, int npipe)
             #endif
                 if (out_redirect_info_parse(command)) {
                     close(STDOUT_FILENO);
-                    dup2(command->out_fd, STDOUT_FILENO); // TODO: check duplicate result carefully.
+                    if (dup2(command->out_fd, STDOUT_FILENO) < 0) {
+                        perror("[2] dup2 error");
+                        exit(EXIT_FAILURE);
+                    }
                 } else {
                     perror("[2] out redirect error");
                     exit(EXIT_FAILURE);
@@ -104,14 +90,14 @@ void execute_cmd(link_cmd_node* cmd_node, int npipe)
             //[pipe] if not last command, out redirect
             if (cmd_node->next && command->out_fd == STDOUT_FILENO) {
                 if (dup2(pipe_fds[j + 1], STDOUT_FILENO) < 0) {
-                    perror("[1] dup2 error");
+                    perror("[3] dup2 error");
                     exit(EXIT_FAILURE);
                 }
             }
             //[pipe] if not first command && j!= 2*npipe, in redirect
             if (j != 0 && command->in_fd == STDIN_FILENO) {
                 if (dup2(pipe_fds[j - 2], STDIN_FILENO) < 0) {
-                    perror("[2] dup2 error");///j-2 0 j+1 1
+                    perror("[3] dup2 error");///j-2 0 j+1 1
                     exit(EXIT_FAILURE);
                 }
             }
@@ -148,7 +134,6 @@ void execute_cmd(link_cmd_node* cmd_node, int npipe)
             p->arg = command->arguments;
             p->next = process_head_node->next;
             process_head_node->next=p;
-            printf("pid:%d\n", p->npid);
         }
         cmd_node = cmd_node->next;
         if (!cmd_node) break;
@@ -159,11 +144,11 @@ void execute_cmd(link_cmd_node* cmd_node, int npipe)
     for(i = 0; i < 2 * npipe; i++){
         close(pipe_fds[i]);
     }
-    // wait
+    // wait subprocess exit if not bg
     if (!(command->flag & BACKGROUND)) {
         for(i = 0; i < npipe + 1; i++){
             wait(&status);
-            printf("===========status=%d\n", status);
+            // printf("===========status=%d\n", status);
         }
     }
 }

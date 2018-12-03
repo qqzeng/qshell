@@ -18,7 +18,7 @@ int main()
         return -1;
     }
     if ((pid = fork()) == 0) {
-        // close(pipe_fd[0]);
+        // close(pipe_fd[0]); // at least one read endpoint.
         close(pipe_fd[1]);
         sleep(10);
         exit(0);

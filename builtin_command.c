@@ -78,7 +78,7 @@ int do_jobs(char* cmd_name, link_cmd_node* cmd_node)
 {
     process_node *p = process_head_node->next;
 	if (NULL == p) {
-    	printf("[qshell:info:built-in_command] there is no bg process.\n");
+    	printf("[qshell:info:built-in_command] empty bg process queue.\n");
     	return 1;
     }
     while(NULL != p) {
@@ -103,7 +103,7 @@ int do_kill(char* cmd_name, link_cmd_node* cmd_node)
 	}
     int pidnum = atoi(cmd_node->next->info_data.arguments[1]);
     signal(SIGQUIT, SIG_DFL);
-    kill(pidnum, SIGQUIT);
+    kill(pidnum, SIGQUIT); // TODO: handle return value.
     signal(SIGQUIT, SIG_IGN);
     process_node *p = process_head_node->next;
     process_node *pre = process_head_node;

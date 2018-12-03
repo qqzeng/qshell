@@ -23,13 +23,14 @@ int process_command() {
     int ncommand = 0;
     link_cmd_node *cmd_list;
     int npipe = 0;
-	while(TRUE) 
+	while(TRUE)
 	{
         printf("====qshell pid: %d=====\n",getpid());
         // show system prompt.
 		type_prompt(prompt);
         // read command from stdio.
         ncommand = read_command(command,parameters);
+        // printf("=====ncommand=%d, command=%s, parameters=%s.\n", ncommand, *command, *parameters);
         if(ncommand <= 0)
             continue;
         // parse command string array.
@@ -39,7 +40,6 @@ int process_command() {
             continue;
         // execute commands.
         execute_cmd(cmd_list, npipe);
-        printf("while exit.....");
     }
     return 1;
 }

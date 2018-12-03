@@ -25,5 +25,6 @@ link_cmd_node* cmd_linklist_create(link_cmd_node *, char**, int*);
 void cmd_info_init(link_cmd_node *);
 void cmd_linklist_print(link_cmd_node *);
 int find_specific_cmd(char*, link_cmd_node *);
+int remove_process_by_id(int);
 
 #endif
