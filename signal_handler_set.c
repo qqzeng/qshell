@@ -3,6 +3,7 @@
 #include "builtin_command.h"
 #include "qutil.h"
 #include "signal_handler_set.h"
+#include "bg_process_handle.h"
 
 /* handle signal that the child process often bg exit */
 void sig_handle_bgp_exit(int signo)

@@ -4,6 +4,7 @@
 #include "param_parse.h"
 #include "init.h"
 #include "signal_handler_set.h"
+#include "bg_process_handle.h"
 
 // #define DEBUG
 
@@ -127,13 +128,8 @@ void execute_cmd(link_cmd_node* cmd_node, int npipe)
             exit(EXIT_FAILURE);
         }
         if ((command->flag & BACKGROUND)){
-            // add to process linklist
-            process_node *p=(process_node*)malloc(sizeof(process_node));
-            p->npid = pid;
-            p->cmd = command->cmd;
-            p->arg = command->arguments;
-            p->next = process_head_node->next;
-            process_head_node->next=p;
+            // add to bg process linklist
+           add_process(pid, command);
         }
         cmd_node = cmd_node->next;
         if (!cmd_node) break;
