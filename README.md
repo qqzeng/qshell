@@ -6,6 +6,6 @@ a tiny shell implementation
 - implement some built-in commands, such as kill, jobs
 - support pipe commands
 - support input and ouput redirection
-- support backgrund jobs by designing bg process struct
+- support background jobs by designing bg process struct
 
 anyway, it's a rough prototype just aimed at learning, and there are many features to be integrated and improved.
